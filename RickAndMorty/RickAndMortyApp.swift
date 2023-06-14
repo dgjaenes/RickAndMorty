@@ -2,8 +2,6 @@
 //  RickAndMortyApp.swift
 //  RickAndMorty
 //
-//  Created by NEORIS on 14/6/23.
-//
 
 import SwiftUI
 
@@ -11,7 +9,9 @@ import SwiftUI
 struct RickAndMortyApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // test dgj
+            //ContentView()
+            CharacterListView()
         }
     }
 }

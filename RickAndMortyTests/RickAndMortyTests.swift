@@ -7,30 +7,61 @@
 
 import XCTest
 @testable import RickAndMorty
+import Combine
 
-final class RickAndMortyTests: XCTestCase {
-
+class TransactionsTests: XCTestCase {
+    
+    private var disposables = Set<AnyCancellable>()
+    private var interactor: CharacterInteractor!
+    private var viewModelTest: CharacterListViewModel!
+    
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        try super.setUpWithError()
+        interactor = CharacterInteractor(characterRepository: CharacterRepositoryMock())
+        viewModelTest = CharacterListViewModel(characterInteractor: interactor)
     }
-
+    
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        interactor = nil
+        viewModelTest = nil
+        try super.setUpWithError()
     }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
+    
     func testPerformanceExample() throws {
-        // This is an example of a performance test case.
         self.measure {
-            // Put the code you want to measure the time of here.
         }
     }
+    
+    func testProductsCellViewModel() throws {
+        
+        let characters = CharactersResponseFactory.makeCharactersResponse().results
+        viewModelTest.characters = characters
+        let expectation = XCTestExpectation(description: "Characters are update")
+        
+            viewModelTest.$characters.sink { items in
+            XCTAssertEqual(items.count, 3)
+            XCTAssertTrue(items[0].name.contains("Rick Sanchez"))
+            expectation.fulfill()
+        }.store(in: &disposables)
+        wait(for: [expectation], timeout: 1)
+        
+    }
+}
 
+private enum CharactersResponseFactory {
+
+    static func makeCharactersResponse() -> CharacterListDO {
+
+        let character1 = CharacterDO(id: 1, name: "Rick Sanchez", status: .alive, species: "Human", type: "Mad scientist", gender: "Male", origin: LocationDO(name: "Earth", url: ""), location: LocationDO(name: "Citadel of Ricks", url: ""), image: "https://rickandmortyapi.com/api/character/avatar/1.jpeg", episode: ["https://rickandmortyapi.com/api/episode/1"], url: "https://rickandmortyapi.com/api/character/1", created: "2017-11-04T18:48:46.250Z")
+        let character2 = CharacterDO(id: 2, name: "Morty Smith", status: .alive, species: "Human", type: "", gender: "Male", origin: LocationDO(name: "Earth", url: ""), location: LocationDO(name: "Citadel of Ricks", url: ""), image: "https://rickandmortyapi.com/api/character/avatar/2.jpeg", episode: ["https://rickandmortyapi.com/api/episode/1"], url: "https://rickandmortyapi.com/api/character/2", created: "2017-11-04T18:50:21.651Z")
+        let character3 = CharacterDO(id: 3, name: "Summer Smith", status: .alive, species: "Human", type: "", gender: "Female", origin: LocationDO(name: "Earth", url: ""), location: LocationDO(name: "Citadel of Ricks", url: ""), image: "https://rickandmortyapi.com/api/character/avatar/3.jpeg", episode: ["https://rickandmortyapi.com/api/episode/6"], url: "https://rickandmortyapi.com/api/character/3", created: "2017-11-04T19:09:56.428Z")
+        return CharacterListDO(
+            info: InfoDO(count: 3, pages: 3, next: "https://rickandmortyapi.com/api/character/?page=3", prev: "https://rickandmortyapi.com/api/character/?page=1"),
+            results: [
+                character1,
+                character2,
+                character3
+            ]
+        )
+    }
 }

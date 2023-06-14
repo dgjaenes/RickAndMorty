@@ -9,7 +9,7 @@ import XCTest
 @testable import RickAndMorty
 import Combine
 
-class TransactionsTests: XCTestCase {
+class CharactersTests: XCTestCase {
     
     private var disposables = Set<AnyCancellable>()
     private var interactor: CharacterInteractor!
@@ -32,7 +32,7 @@ class TransactionsTests: XCTestCase {
         }
     }
     
-    func testProductsCellViewModel() throws {
+    func testCharactersTestsViewModel() throws {
         
         let characters = CharactersResponseFactory.makeCharactersResponse().results
         viewModelTest.characters = characters
@@ -44,7 +44,33 @@ class TransactionsTests: XCTestCase {
             expectation.fulfill()
         }.store(in: &disposables)
         wait(for: [expectation], timeout: 1)
+    }
+    
+    func testInteractorCharactersTests() throws {
         
+        var charactersList: CharacterListDO!
+        let error: Error? = nil
+        let expectation = self.expectation(description: "Get transactions")
+        
+        interactor.getCharacters(page: nil)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print(error)
+                }
+                
+                expectation.fulfill()
+            }, receiveValue: { value in
+                charactersList = value
+            })
+            .store(in: &disposables)
+        
+        wait(for: [expectation], timeout: 10)
+        XCTAssertNil(error)
+        XCTAssertEqual(charactersList.results.count, 20)
+        XCTAssertTrue(charactersList.results[0].name.contains("Rick Sanchez"))
     }
 }
 

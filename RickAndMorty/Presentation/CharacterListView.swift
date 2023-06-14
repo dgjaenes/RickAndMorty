@@ -7,7 +7,7 @@ import SwiftUI
 
 struct CharacterListView: View {
 
-    @StateObject var viewModel = CharacterListViewModel(characterInteractor: CharacterInteractor(characterRepository: CharacterRepository()))
+    @StateObject var viewModel = CharacterListViewModel(characterInteractor: InteractorProvaider.getCharactersInteractor())
     var body: some View {
         NavigationView {
             List {

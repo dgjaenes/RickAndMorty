@@ -2,8 +2,6 @@
 //  CharacterRepositoryMock.swift
 //  RickAndMortyTests
 //
-//  Created by NEORIS on 14/6/23.
-//
 
 import Foundation
 @testable import RickAndMorty

@@ -2,8 +2,7 @@
 //  RickAndMortyUITests.swift
 //  RickAndMortyUITests
 //
-//  Created by NEORIS on 14/6/23.
-//
+
 
 import XCTest
 

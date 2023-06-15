@@ -27,7 +27,15 @@ final class CharacterListViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func searchCharacter(name: String) {
+    func initView() {
+        if !totalCharacters.isEmpty {
+            characters = totalCharacters
+        } else {
+            loadAllPages()
+        }
+    }
+    
+    private func searchCharacter(name: String) {
         DispatchQueue.main.sync { [weak self] in
             if name != "" {
                 self?.characters.removeAll()
@@ -40,12 +48,14 @@ final class CharacterListViewModel: ObservableObject {
         }
     }
     
-    func loadAllPages() {
+    private func loadAllPages() {
         DispatchQueue.main.async {
             self.isLoading = false
         }
         var page: Int?
-        page = currentPage > 1 ? currentPage : nil
+        page = currentPage > 1 && currentPage <= self.totalPages
+                ? currentPage
+                : nil
         characterInteractor.getCharacters(page: page)
             .sink(receiveCompletion: { [weak self] completion in
                 guard let self = self else { return }

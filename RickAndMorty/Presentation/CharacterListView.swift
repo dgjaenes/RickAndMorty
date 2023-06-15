@@ -27,15 +27,16 @@ struct CharacterListView: View {
                 }
                 .navigationBarTitle(Text("Rick and Morty"))
                 .onAppear {
-                    loadAllData()
+                    viewModel.name = ""
+                    initView()
                 }
             }
             
         }
     }
 
-    private func loadAllData() {
-        viewModel.loadAllPages()
+    private func initView() {
+        viewModel.initView()
     }
 }
 
@@ -43,14 +44,7 @@ private extension CharacterListView {
     
     var searchField: some View {
         HStack(alignment: .center) {
-            TextField("example: Morty, , Thanos ...", text: $viewModel.name)
-        }
-    }
-    
-    var emptySection: some View {
-        Section {
-            Text("No results")
-                .foregroundColor(.gray)
+            TextField("example: Morty, Smith, Lincler ...", text: $viewModel.name)
         }
     }
 }

@@ -16,7 +16,7 @@ class CharacterRepository: ManagerRAMAppRepository, CharacterRepositoryProtocol 
     struct TransactionsAPI {
         static let scheme = "https"
         static let host = "rickandmortyapi.com"
-        static let path = "/api/character/"
+        static let path = "/api/character"
     }
     
     func getCharacter(id: String) -> AnyPublisher<CharacterDO, RAMAppError> {
@@ -24,7 +24,7 @@ class CharacterRepository: ManagerRAMAppRepository, CharacterRepositoryProtocol 
     }
     
     func getCharacters(page: Int?) -> AnyPublisher<CharacterListDO, RAMAppError> {
-        return execute(components: makeUrltComponents())
+        return execute(components: makeUrltComponents(page: page))
     }
     
     func makeUrltComponents(id: String? = nil, page: Int? = nil) -> URLComponents {
@@ -36,7 +36,8 @@ class CharacterRepository: ManagerRAMAppRepository, CharacterRepositoryProtocol 
             components.path = "\(TransactionsAPI.path)\(id)"
         }
         else if let page = page {
-            components.path = "\(TransactionsAPI.path)?page=\(page)"
+            let pageParameter = URLQueryItem(name: "page", value: String(page))
+            components.queryItems = [pageParameter]
         }
         
         return components

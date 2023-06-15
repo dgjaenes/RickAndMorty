@@ -32,7 +32,7 @@ enum StatusDO: String, Codable {
     case unknown = "unknown"
 }
 
-extension CharacterDO: Equatable {
+extension CharacterDO: Equatable, Hashable {
     static func == (lhs: CharacterDO, rhs: CharacterDO) -> Bool {
         return lhs.id == rhs.id &&
             lhs.name == rhs.name &&
@@ -49,11 +49,11 @@ extension CharacterDO: Equatable {
     }
 }
 
-extension LocationDO: Equatable {
+extension LocationDO: Equatable, Hashable {
     static func == (lhs: LocationDO, rhs: LocationDO) -> Bool {
         return lhs.name == rhs.name &&
             lhs.url == rhs.url
     }
 }
 
-extension StatusDO: Equatable {}
+extension StatusDO: Equatable, Hashable {}

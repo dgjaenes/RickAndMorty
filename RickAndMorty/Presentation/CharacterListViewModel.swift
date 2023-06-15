@@ -8,22 +8,45 @@ import Combine
 
 final class CharacterListViewModel: ObservableObject {
     
+    @Published var name: String = ""
     @Published var characters = [CharacterDO]()
     @Published var isLoading = false
     @Published var currentPage = 1
     @Published var totalPages = 1
+    lazy var totalCharacters = [CharacterDO]()
     lazy var cancellables = Set<AnyCancellable>()
     private var characterInteractor : CharacterInteractorProtocol
     
     init(characterInteractor: CharacterInteractorProtocol) {
         self.characterInteractor = characterInteractor
+        let scheduler: DispatchQueue = DispatchQueue(label: "SearchCharactersViewModel")
+        $name
+            .dropFirst(1)
+            .debounce(for: .seconds(0.5), scheduler: scheduler)
+            .sink(receiveValue: searchCharacter(name:))
+            .store(in: &cancellables)
+    }
+    
+    func searchCharacter(name: String) {
+        DispatchQueue.main.sync { [weak self] in
+            if name != "" {
+                self?.characters.removeAll()
+                self?.characters.append(contentsOf: self?.totalCharacters.filter({$0.name.contains(name)}) ?? [])
+            } else {
+                self?.characters.removeAll()
+                self?.characters.append(contentsOf: self?.totalCharacters ?? [])
+            }
+            print("")
+        }
     }
     
     func loadAllPages() {
         DispatchQueue.main.async {
             self.isLoading = false
         }
-        characterInteractor.getCharacters(page: currentPage)
+        var page: Int?
+        page = currentPage > 1 ? currentPage : nil
+        characterInteractor.getCharacters(page: page)
             .sink(receiveCompletion: { [weak self] completion in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
@@ -33,21 +56,21 @@ final class CharacterListViewModel: ObservableObject {
                 case .failure(let error):
                     debugPrint("Error loading page: \(self.currentPage) with error: \(error)")
                 case .finished:
-                    DispatchQueue.main.async {
-                        self.currentPage += 1
-                    }
-                    if self.currentPage <= self.totalPages {
-                        self.loadAllPages()
-                    }
+                    break
                 }
             }, receiveValue: { [weak self] response in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
                     self.characters.append(contentsOf: response.results)
+                    self.totalCharacters = self.characters
                     self.totalPages = response.info.pages
+                    
+                    self.currentPage += 1
+                    if self.currentPage <= self.totalPages {
+                        self.loadAllPages()
+                    }
                 }
             })
             .store(in: &cancellables)
     }
 }
-

@@ -7,7 +7,7 @@ import SwiftUI
 
 struct CharacterListView: View {
 
-    @StateObject var viewModel = CharacterListViewModel(characterInteractor: InteractorProvaider.getCharactersInteractor())
+    @ObservedObject var viewModel = CharacterListViewModel(characterInteractor: InteractorProvaider.getCharactersInteractor())
     var body: some View {
         NavigationView {
             List {
@@ -31,5 +31,11 @@ struct CharacterListView: View {
 
     private func loadAllData() {
         viewModel.loadAllPages()
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        CharacterListView()
     }
 }

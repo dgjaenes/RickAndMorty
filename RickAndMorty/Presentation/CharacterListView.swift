@@ -7,7 +7,7 @@ import SwiftUI
 
 struct CharacterListView: View {
 
-    @StateObject var viewModel = CharacterListViewModel(characterInteractor: InteractorProvaider.getCharactersInteractor())
+    @ObservedObject var viewModel = CharacterListViewModel(characterInteractor: InteractorProvaider.getCharactersInteractor())
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
@@ -46,5 +46,11 @@ private extension CharacterListView {
         HStack(alignment: .center) {
             TextField("example: Morty, Smith, Lincler ...", text: $viewModel.name)
         }
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        CharacterListView()
     }
 }
